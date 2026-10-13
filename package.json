@@ -1,0 +1,22 @@
+{
+  "name": "aws-console-relogin",
+  "version": "1.0.0",
+  "description": "Chrome extension that signs IAM Identity Center console sessions back in before they expire and restores their tabs.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oreonl/aws-console-relogin.git"
+  },
+  "homepage": "https://github.com/oreonl/aws-console-relogin",
+  "bugs": "https://github.com/oreonl/aws-console-relogin/issues",
+  "scripts": {
+    "test": "node test/background.test.mjs",
+    "screenshot": "P=\"$(mktemp -d)\" && \"${CHROME:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}\" --headless=new --disable-gpu --hide-scrollbars --force-device-scale-factor=1 --window-size=1280,800 --allow-file-access-from-files --user-data-dir=\"$P\" --screenshot=\"$PWD/store/screenshot-1280x800.png\" \"file://$PWD/store/screenshot.html\" 2>/dev/null; rm -rf \"$P\"",
+    "package":"mkdir -p dist && rm -f dist/aws-console-relogin.zip && zip -qX dist/aws-console-relogin.zip manifest.json *.js *.html *.css LICENSE icons/*.png && unzip -l dist/aws-console-relogin.zip"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>AWS Console Re-login settings</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { padding: 24px 16px; }
+    main { max-width: 640px; margin: 0 auto; }
+    h1 { font-size: 20px; margin: 0 0 16px; }
+    h2 { font-size: 15px; margin: 24px 0 4px; }
+    label { display: block; font-weight: 600; margin: 16px 0 4px; }
+    .hint { color: var(--muted); margin: 4px 0 0; }
+    .wide { width: 100%; }
+    .check { display: flex; gap: 8px; align-items: center; font-weight: normal; }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    th { text-align: left; font-weight: 600; color: var(--muted); padding: 4px 4px 4px 0; }
+    td { padding: 4px 4px 4px 0; }
+    td input { width: 100%; }
+    td:last-child { width: 1%; }
+    .actions { display: flex; gap: 12px; align-items: center; margin-top: 24px; }
+    #saved { color: var(--muted); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>AWS Console Re-login</h1>
+
+    <label for="portal">AWS access portal URL</label>
+    <input id="portal" class="wide" type="url" placeholder="https://d-1234567890.awsapps.com/start">
+    <p class="hint">Filled in automatically the first time you open your portal.</p>
+
+    <label for="duration">Session length (minutes)</label>
+    <input id="duration" type="number" min="5" max="720" step="1">
+    <p class="hint">Match your permission set's session duration. AWS's default is 60.</p>
+
+    <label class="check"><input id="auto" type="checkbox"> Re-login automatically 2 minutes before a session expires</label>
+    <label class="check"><input id="group" type="checkbox"> Group tabs by account</label>
+    <p class="hint">Groups use the account names from your access portal. Open its account list once to load them.</p>
+
+    <h2>Accounts</h2>
+    <p class="hint">
+      Names and roles are learned from your access portal. Fill one in here to override it.
+      If no role is known, the portal will ask you to pick one.
+    </p>
+    <table>
+      <thead><tr><th>Account ID</th><th>Name (optional)</th><th>Permission set</th><th></th></tr></thead>
+      <tbody id="accounts"></tbody>
+    </table>
+    <button id="add" type="button" style="margin-top: 8px">Add account</button>
+
+    <div class="actions">
+      <button id="save" class="primary" type="button">Save</button>
+      <span id="saved"></span>
+    </div>
+  </main>
+  <script type="module" src="options.js"></script>
+</body>
+</html>

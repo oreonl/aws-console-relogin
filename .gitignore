@@ -1,0 +1,10 @@
+# macOS
+.DS_Store
+
+# Chrome packaging: never commit the private key Chrome generates when you pack an extension
+*.pem
+*.crx
+*.zip
+dist/
+
+node_modules/

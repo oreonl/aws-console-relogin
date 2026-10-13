@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>portal.js test</title>
+  <style>
+    body { font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 24px; }
+    .pass { color: #1a7f37; }
+    .fail { color: #cf222e; }
+    pre { background: #f6f8fa; padding: 8px; }
+  </style>
+</head>
+<body>
+  <!-- Checks that portal.js finds account names in several access-portal-style layouts.
+       Open this file in Chrome; the page title becomes PASS or FAIL. -->
+  <h1>portal.js</h1>
+  <div id="results">Running…</div>
+  <div id="stage"></div>
+
+  <script>
+    // Stand-in for the extension API: keep what portal.js reports.
+    let reported = null;
+    window.chrome = { runtime: { sendMessage: async (msg) => { reported = msg.names; } } };
+  </script>
+  <script src="../portal.js"></script>
+  <script>
+    const cases = [
+      {
+        name: 'Expandable rows: name, then "ID | email"; one row expanded to show roles',
+        html: `<h2>AWS access portal</h2><button>Accounts</button><button>Applications</button>
+          <input placeholder="Filter accounts by name, ID, or email">
+          <div role="list">
+            <div role="listitem"><div role="button" aria-expanded="false"><span aria-hidden="true">▸</span>
+              <span><strong>acme-prod</strong><div><span>111111111111</span> | <span>aws-prod@example.com</span></div></span></div></div>
+            <div role="listitem"><div role="button" aria-expanded="true"><span aria-hidden="true">▾</span>
+              <span><strong>acme-staging</strong><div><span>222222222222</span> | <span>aws-staging@example.com</span></div></span></div>
+              <ul><li><a href="#">AdministratorAccess</a> <a href="#">Access keys</a></li><li><a href="#">ReadOnly</a></li></ul></div>
+          </div>`,
+        expect: { 111111111111: 'acme-prod', 222222222222: 'acme-staging' },
+      },
+      {
+        name: 'Older portal: separate name, "#ID" and email blocks',
+        html: `<div class="instance-section"><div class="logo"></div><div class="name">acme-dev</div>
+            <div class="accountId">#333333333333</div><div class="email">aws-dev@example.com</div></div>
+          <div class="instance-section"><div class="name">acme-data</div>
+            <div class="accountId">#444444444444</div><div class="email">aws-data@example.com</div></div>`,
+        expect: { 333333333333: 'acme-dev', 444444444444: 'acme-data' },
+      },
+      {
+        name: 'One account: a label, a dashed ID, and an email containing another number',
+        html: `<button><div>Solo Sandbox</div><p>Account ID: 5555-5555-5555</p><p>aws+999999999999@example.com</p></button>`,
+        expect: { 555555555555: 'Solo Sandbox' },
+      },
+      {
+        name: 'Table',
+        html: `<table><tr><th>Name</th><th>ID</th><th>Email</th></tr>
+          <tr><td>billing</td><td>666666666666</td><td>billing@example.com</td></tr>
+          <tr><td>security-audit</td><td>777777777777</td><td>audit@example.com</td></tr></table>`,
+        expect: { 666666666666: 'billing', 777777777777: 'security-audit' },
+      },
+    ];
+
+    const sorted = (obj) => JSON.stringify(Object.entries(obj || {}).sort());
+    const stage = document.getElementById('stage');
+
+    (async () => {
+      const results = [];
+      for (const c of cases) {
+        reported = null;
+        // Render after load, like the real portal, so the MutationObserver path is used.
+        stage.innerHTML = c.html;
+        await new Promise((r) => setTimeout(r, 800));
+        results.push({ ...c, got: reported, ok: sorted(reported) === sorted(c.expect) });
+      }
+      stage.replaceChildren();
+
+      const out = document.getElementById('results');
+      out.replaceChildren(...results.map((r) => {
+        const div = document.createElement('div');
+        div.className = r.ok ? 'pass' : 'fail';
+        div.textContent = `${r.ok ? 'PASS' : 'FAIL'}  ${r.name}`;
+        if (!r.ok) {
+          const pre = document.createElement('pre');
+          pre.textContent = `expected ${JSON.stringify(r.expect)}\ngot      ${JSON.stringify(r.got)}`;
+          div.append(pre);
+        }
+        return div;
+      }));
+      document.title = results.every((r) => r.ok) ? 'PASS' : 'FAIL';
+    })();
+  </script>
+</body>
+</html>

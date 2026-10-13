@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>AWS Console Re-login</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { width: 340px; padding: 12px; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    h1 { font-size: 14px; margin: 0; }
+    ul { list-style: none; margin: 0; padding: 0; }
+    li { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-top: 1px solid var(--border); }
+    li:first-child { border-top: 0; }
+    .info { flex: 1; min-width: 0; }
+    .name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .meta { color: var(--muted); font-size: 12px; }
+    .left { font-size: 12px; white-space: nowrap; }
+    .left.soon { color: var(--warn); }
+    .left.gone { color: var(--danger); }
+    .empty { color: var(--muted); padding: 12px 0; }
+    footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; gap: 8px; }
+    .auto { color: var(--muted); font-size: 12px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AWS sessions</h1>
+    <a href="#" id="settings">Settings</a>
+  </header>
+  <div id="notice" class="notice" hidden></div>
+  <ul id="list"></ul>
+  <footer>
+    <span class="auto" id="auto"></span>
+    <button id="all" class="primary" hidden>Re-login all</button>
+  </footer>
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "AWS Console Re-login",
+  "version": "1.0.0",
+  "description": "Signs IAM Identity Center console sessions back in before they expire, restores their tabs, and groups tabs by account.",
+  "permissions": ["storage", "alarms", "tabGroups"],
+  "host_permissions": [
+    "https://*.console.aws.amazon.com/*",
+    "https://*.signin.aws.amazon.com/*",
+    "https://*.awsapps.com/*",
+    "https://*.app.aws/*"
+  ],
+  "background": { "service_worker": "background.js", "type": "module" },
+  "content_scripts": [
+    {
+      "matches": ["https://*.awsapps.com/start*", "https://*.app.aws/*"],
+      "js": ["portal.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "AWS Console Re-login",
+    "default_icon": { "16": "icons/icon16.png", "32": "icons/icon32.png" }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "options_page": "options.html"
+}

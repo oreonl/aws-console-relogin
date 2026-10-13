@@ -1,0 +1,161 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Store screenshot</title>
+  <!-- Chrome Web Store screenshot (1280x800) with made-up data. Render with:
+       npm run screenshot -->
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    html, body { margin: 0; width: 1280px; height: 800px; overflow: hidden; }
+    body {
+      background: linear-gradient(160deg, #2b5480 0%, #132a44 100%);
+      font: 13px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #1f2328;
+    }
+    .headline { position: absolute; top: 44px; left: 0; right: 0; text-align: center; color: #fff; }
+    .headline h1 { margin: 0; font-size: 36px; font-weight: 700; letter-spacing: -0.01em; }
+    .headline p { margin: 10px 0 0; font-size: 18px; color: #c6d4e3; }
+
+    /* Browser window, drawn at 920px wide and scaled up so the UI reads at store size. */
+    .window {
+      position: absolute; left: 88px; top: 168px; width: 920px; height: 600px;
+      transform: scale(1.2); transform-origin: top left;
+      background: #fff; border-radius: 10px 10px 0 0; overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+    }
+    .tabstrip { height: 40px; background: #dee1e6; display: flex; align-items: flex-end; padding-left: 12px; }
+    .lights { display: flex; gap: 8px; align-self: center; margin-right: 16px; }
+    .lights i { width: 12px; height: 12px; border-radius: 50%; display: block; }
+    .chip {
+      align-self: center; margin: 0 4px 0 6px; padding: 2px 8px; border-radius: 6px;
+      color: #fff; font-size: 12px; font-weight: 600; white-space: nowrap;
+    }
+    .tab {
+      width: 128px; height: 32px; box-sizing: border-box; padding: 0 10px; display: flex; align-items: center; gap: 6px;
+      color: #3c4043; font-size: 12px; white-space: nowrap; position: relative;
+    }
+    .tab span { overflow: hidden; text-overflow: ellipsis; }
+    .tab.active { background: #fff; border-radius: 8px 8px 0 0; color: #202124; }
+    .tab::after { /* the group's colored line under its tabs */
+      content: ""; position: absolute; left: 4px; right: 4px; bottom: 0; height: 2px; background: var(--group);
+    }
+    .tab.active::after { display: none; }
+    .tab .fav { width: 14px; height: 14px; border-radius: 3px; background: #9aa0a6; flex: none; }
+    .newtab { align-self: center; margin-left: 8px; color: #5f6368; font-size: 18px; }
+
+    .toolbar { height: 40px; display: flex; align-items: center; gap: 14px; padding: 0 12px; border-bottom: 1px solid #dadce0; }
+    .toolbar svg { width: 16px; height: 16px; fill: none; stroke: #5f6368; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .omnibox {
+      flex: 1; height: 28px; border-radius: 14px; background: #f1f3f4; display: flex; align-items: center;
+      gap: 8px; padding: 0 12px; color: #202124; font-size: 13px; white-space: nowrap; overflow: hidden;
+    }
+    .omnibox .dim { color: #5f6368; }
+    .ext { position: relative; width: 16px; height: 16px; }
+    .ext img { width: 16px; height: 16px; display: block; }
+    .badge {
+      position: absolute; left: 7px; top: 9px; height: 10px; padding: 0 2.5px; border-radius: 3px;
+      background: #1f883d; color: #fff; font-size: 8.5px; font-weight: 700; line-height: 10px;
+      box-shadow: 0 0 0 1px #fff;
+    }
+    .avatar { width: 20px; height: 20px; border-radius: 50%; background: #8ab4f8; }
+
+    /* Neutral placeholder page. */
+    .page { display: flex; height: 520px; }
+    .side { width: 170px; padding: 18px 16px; border-right: 1px solid #eceef0; }
+    .main { flex: 1; padding: 18px 22px; }
+    .bar { height: 10px; border-radius: 5px; background: #e6e8eb; margin-bottom: 14px; }
+    .row { display: flex; gap: 18px; padding: 12px 0; border-bottom: 1px solid #f0f1f2; }
+    .row .bar { margin: 0; }
+
+    /* The extension popup, using the same markup and styles as popup.html. */
+    .popup {
+      /* Light theme regardless of the rendering machine's dark mode, to match the window. */
+      --bg: #ffffff; --fg: #1f2328; --muted: #656d76; --border: #d0d7de;
+      --accent: #0969da; --accent-fg: #ffffff; --warn: #9a6700; --danger: #cf222e;
+      position: absolute; top: 84px; right: 56px; width: 340px; padding: 12px; box-sizing: content-box;
+      background: var(--bg); color: var(--fg); border-radius: 8px; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
+    }
+    .popup header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .popup h1 { font-size: 14px; margin: 0; }
+    .popup ul { list-style: none; margin: 0; padding: 0; }
+    .popup li { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-top: 1px solid var(--border); }
+    .popup li:first-child { border-top: 0; }
+    .popup .info { flex: 1; min-width: 0; }
+    .popup .name { font-weight: 600; }
+    .popup .meta { color: var(--muted); font-size: 12px; }
+    .popup .left { font-size: 12px; white-space: nowrap; }
+    .popup footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+    .popup .auto { color: var(--muted); font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="headline">
+    <h1>AWS console sessions that renew themselves</h1>
+    <p>Signs each account back in 2 minutes before its session ends, reloads its tabs, and groups them by account.</p>
+  </div>
+
+  <div class="window">
+    <div class="tabstrip">
+      <div class="lights"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></div>
+      <div class="chip" style="background:#1a73e8">acme-prod</div>
+      <div class="tab active" style="--group:#1a73e8"><i class="fav"></i><span>EC2 Instances</span></div>
+      <div class="tab" style="--group:#1a73e8"><i class="fav"></i><span>Lambda</span></div>
+      <div class="chip" style="background:#e8710a">acme-staging</div>
+      <div class="tab" style="--group:#e8710a"><i class="fav"></i><span>S3 Buckets</span></div>
+      <div class="tab" style="--group:#e8710a"><i class="fav"></i><span>ECS Clusters</span></div>
+      <div class="chip" style="background:#1e8e3e">acme-data</div>
+      <div class="newtab">+</div>
+    </div>
+
+    <div class="toolbar">
+      <svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg>
+      <svg viewBox="0 0 16 16"><path d="m6 3 5 5-5 5"/></svg>
+      <svg viewBox="0 0 16 16"><path d="M13 8a5 5 0 1 1-1.5-3.5M13 2.5V5h-2.5"/></svg>
+      <div class="omnibox">
+        <svg viewBox="0 0 16 16" style="width:13px;height:13px"><rect x="3.5" y="7" width="9" height="6.5" rx="1"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg>
+        <span>123456789012-k3x9q2ab.us-east-1.console.aws.amazon.com<span class="dim">/ec2/home?region=us-east-1#Instances:</span></span>
+      </div>
+      <div class="ext"><img src="../icons/icon32.png" alt=""><span class="badge">18m</span></div>
+      <div class="avatar" style="margin-left:8px"></div>
+    </div>
+
+    <div class="page">
+      <div class="side">
+        <div class="bar" style="width:70%"></div><div class="bar" style="width:55%"></div>
+        <div class="bar" style="width:80%"></div><div class="bar" style="width:60%"></div>
+        <div class="bar" style="width:72%"></div><div class="bar" style="width:50%"></div>
+      </div>
+      <div class="main">
+        <div class="bar" style="width:220px;height:16px;margin-bottom:20px"></div>
+        <div class="bar" style="width:100%;height:28px;border-radius:6px;margin-bottom:18px"></div>
+        <div class="row"><div class="bar" style="width:22%"></div><div class="bar" style="width:14%"></div><div class="bar" style="width:18%"></div><div class="bar" style="width:12%"></div></div>
+        <div class="row"><div class="bar" style="width:20%"></div><div class="bar" style="width:16%"></div><div class="bar" style="width:15%"></div><div class="bar" style="width:10%"></div></div>
+        <div class="row"><div class="bar" style="width:24%"></div><div class="bar" style="width:12%"></div><div class="bar" style="width:19%"></div><div class="bar" style="width:13%"></div></div>
+        <div class="row"><div class="bar" style="width:18%"></div><div class="bar" style="width:15%"></div><div class="bar" style="width:16%"></div><div class="bar" style="width:11%"></div></div>
+        <div class="row"><div class="bar" style="width:21%"></div><div class="bar" style="width:13%"></div><div class="bar" style="width:17%"></div><div class="bar" style="width:12%"></div></div>
+        <div class="row"><div class="bar" style="width:19%"></div><div class="bar" style="width:16%"></div><div class="bar" style="width:14%"></div><div class="bar" style="width:10%"></div></div>
+      </div>
+    </div>
+
+    <div class="popup">
+      <header><h1>AWS sessions</h1><a href="#">Settings</a></header>
+      <ul>
+        <li>
+          <div class="info"><div class="name">acme-staging</div><div class="meta">ReadOnly · 2 tabs</div></div>
+          <span class="left">18 min left</span><button>Re-login</button>
+        </li>
+        <li>
+          <div class="info"><div class="name">acme-prod</div><div class="meta">AdministratorAccess · 2 tabs</div></div>
+          <span class="left">42 min left</span><button>Re-login</button>
+        </li>
+        <li>
+          <div class="info"><div class="name">acme-data</div><div class="meta">DeveloperAccess · 1 tab</div></div>
+          <span class="left">57 min left</span><button>Re-login</button>
+        </li>
+      </ul>
+      <footer><span class="auto">Auto re-login is on</span><button class="primary">Re-login all</button></footer>
+    </div>
+  </div>
+</body>
+</html>
